@@ -8,6 +8,7 @@ Created on Tue Jul 21 09:30:19 2020
 import numpy as np
 from flask import Flask, request, jsonify, render_template
 import pickle
+from Mail_Sender import email_sender
 
 app = Flask(__name__,template_folder='')
 diamond = pickle.load(open('diamond.pkl', 'rb'))
@@ -69,6 +70,7 @@ def predict():
         clarity_dummy = clarity_dict[final_features[0][5]]
         diamond_input = [carat] + cut_dummy + clarity_dummy + color_dummy
         prediction = diamond.predict(np.reshape(diamond_input, (1, -1)))
+        email_sender(final_features[0][1],'Estimated Diamond Price is $ {:,.2f}'.format(prediction[0]))
         return render_template('index.html', message='Estimated Diamond Price is $ {:,.2f}'.format(prediction[0]))
 
 if __name__ == "__main__":
