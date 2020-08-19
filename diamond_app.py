@@ -7,11 +7,45 @@ Created on Tue Jul 21 09:30:19 2020
 
 import numpy as np
 from flask import Flask, request, jsonify, render_template
+from flask_sqlalchemy import SQLAlchemy
 import pickle
 from Mail_Sender import email_sender
 
 app = Flask(__name__,template_folder='')
 diamond = pickle.load(open('diamond.pkl', 'rb'))
+
+ENV = 'prod'
+if ENV == 'dev':
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:XXXXXXXXXXX@localhost/Diamond'    
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://iswvvubpqmksji:e4e4a7c35a122fec2b193bb5f455300535aef14980f804cfd8964840f316113a@ec2-52-86-33-50.compute-1.amazonaws.com:5432/dar446e7nl99df'
+
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+class Record(db.Model):
+    __tablename__ = 'record'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200))
+    carat = db.Column(db.Float)
+    mail = db.Column(db.String(200))
+    cut = db.Column(db.String(200))
+    clarity = db.Column(db.String(200))
+    color = db.Column(db.String(200))
+    prediced_price = db.Column(db.Float)
+    comment = db.Column(db.Text())
+
+    def __init__(self, name,  mail, carat, cut, clarity, color, prediced_price, comment):
+        self.name = name
+        self.mail = mail
+        self.carat = carat
+        self.cut = cut
+        self.clarity = clarity
+        self.color = color
+        self.prediced_price = prediced_price
+        self.comment = comment
 
 @app.route('/')
 def home():
@@ -70,6 +104,18 @@ def predict():
         clarity_dummy = clarity_dict[final_features[0][5]]
         diamond_input = [carat] + cut_dummy + clarity_dummy + color_dummy
         prediction = diamond.predict(np.reshape(diamond_input, (1, -1)))
+
+        data = Record(name=final_features[0][0], 
+                    mail=final_features[0][1],
+                    carat=final_features[0][2],
+                    cut=final_features[0][3],
+                    clarity=final_features[0][5],
+                    color=final_features[0][4],
+                    prediced_price=prediction[0],
+                    comment=final_features[0][6])
+        db.session.add(data)
+        db.session.commit()
+
         email_sender(final_features[0][1],'Estimated Diamond Price is $ {:,.2f}'.format(prediction[0]))
         return render_template('index.html', message='Estimated Diamond Price is $ {:,.2f}'.format(prediction[0]))
 

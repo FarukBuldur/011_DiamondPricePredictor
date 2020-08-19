@@ -1,1 +1,0 @@
-web: gunicorn diamond_app:app
