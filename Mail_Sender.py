@@ -16,7 +16,7 @@ def email_sender(receiver_email, message_params):
 #
  #   """ + message_params +""" ."""
 
-    message = f"<h3>New Diamond Prediction</h3><ul><li>Predicted Price: {message_params[0]}</li><li>Carat: {message_params[1]}</li><li>Cut: {message_params[2]}</li><li>Color: {message_params[3]}</li><li>Clarity: {message_params[4]}</li><li>Comments: {message_params[5]}</li></ul>"
+    message = f"<h3>New Diamond Prediction</h3><ul><li> {message_params[0]}</li><li>Carat: {message_params[1]}</li><li>Cut: {message_params[2]}</li><li>Color: {message_params[3]}</li><li>Clarity: {message_params[4]}</li><li>Comments: {message_params[5]}</li></ul>"
 
     msg = MIMEText(message, 'html')
     msg['Subject'] = 'Your Diamond Price Prediction'

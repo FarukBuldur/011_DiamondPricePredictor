@@ -122,7 +122,7 @@ def predict():
         db.session.add(data)
         db.session.commit()
 
-        mail_params = [['Estimated Diamond Price is $ {:,.2f}'.format(prediction[0])][0],
+        mail_params = [['Estimated Diamond Price is:  $ {:,.2f}'.format(prediction[0])][0],
         final_features[0][2],final_features[0][3],final_features[0][4],final_features[0][5],final_features[0][6]]
 
         email_sender(final_features[0][1],mail_params)
