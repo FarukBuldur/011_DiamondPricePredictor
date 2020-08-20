@@ -47,7 +47,7 @@ class Record(db.Model):
         self.prediced_price = prediced_price
         self.comment = comment
 
-@app.route('/')
+@app.route('/',methods=['POST'])
 def home():
     return render_template('index.html')
 
@@ -123,6 +123,7 @@ def predict():
 
         email_sender(final_features[0][1],mail_params)
         return render_template('result.html', message='Estimated Diamond Price is $ {:,.2f}'.format(prediction[0]))
+
 
 if __name__ == "__main__":
     app.run(debug=True)
